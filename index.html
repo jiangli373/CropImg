@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <style>
+        .s-bg-cutimg-select {
+            position: absolute;
+            overflow: hidden;
+            border: none;
+            cursor: move;
+            width: 288px;
+            height: 180px;
+            left: 0px;
+            top:0px;
+        }
+        .s-bg-cutimg-shadow {
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.6);
+            background: white\9;
+            filter: alpha(opacity=60) \9;
+        }
+        .s-bg-cutimg-select-border {
+            border: 1px #030000 dashed;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: url(http://su.bdimg.com/static/superplus/img/skin/hack_4ie_drag_7462ed62.png)\9;
+        }
+        .s-bg-cutimg-show-img {
+            position: absolute;
+            width: 288px;
+            height: 180px;
+            left: 0px;
+            top: 0px;
+        }
+        .cutimg-ctrl-cell {
+            position: absolute;
+            background: rgba(255, 255, 255,0.5);
+            background: white\9;
+            filter: alpha(opacity=50) \9;
+            border: 1px #030000 solid;
+            width: 7px;
+            height: 7px;
+        }
+        .s-bg-cutimg-ctrl-mod {
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        .s-bg-cutimg-ctrl-tl {cursor: nw-resize;}
+        .s-bg-cutimg-ctrl-tr {
+            top: 0;
+            right: 0;
+            cursor: ne-resize;
+        }
+        .s-bg-cutimg-ctrl-bl {
+            bottom: 0;
+            left: 0;
+            cursor: sw-resize;
+        }
+        .s-bg-cutimg-ctrl-br {
+            bottom: 0;
+            right: 0;
+            cursor: se-resize;
+        }
+    </style>
+    <script src="jquery-1.8.3.min.js"></script>
+</head>
+<body>
+<div style="position: absolute;top:30px;left: 100px;" id='out'>
+    <div style="width:288px;height:180px;" id='s_bg_cut_img'>
+        <img src="38.jpg" style="width:288px;height:180px;">
+
+<div class="s-bg-cutimg-ctrl-mod" style="width:288px;height:180px;">
+    <div class="s-bg-cutimg-shadow"></div>
+<div class="s-bg-cutimg-select">
+    <img src="38.jpg" class="s-bg-cutimg-show-img"/>
+    <div class="s-bg-cutimg-select-border"></div>
+    <div class="s-bg-cutimg-ctrl-tl cutimg-ctrl-cell" style="left:0px;top:0px;"></div>
+    <div class="s-bg-cutimg-ctrl-tr cutimg-ctrl-cell" style="right:0px;top:0px;"></div>
+    <div class="s-bg-cutimg-ctrl-bl cutimg-ctrl-cell" style="left:0px;bottom:0px;"></div>
+    <div class="s-bg-cutimg-ctrl-br cutimg-ctrl-cell" style="right:0px;bottom:0px;">
+
+    </div>
+</div>
+    </div>
+    </div>
+</div>
+
+<script>
+
+
+    function dd(endP,startP,originWH){
+        var disaccount = 1;
+        var dis = {
+            w:0,
+            h:0
+        };
+        var finalWH = {
+            width:0,
+            height:0
+        };
+//        dis.x = (endP.x-startP.x)/disaccount;
+//        dis.y = (endP.y-startP.y)/disaccount;
+//        console.log('===dis.x====',dis.x);
+        finalWH.width = 288-endP.x;
+        finalWH.height =180-endP.y;
+
+        return finalWH;
+
+    }
+    function getPosition(point,ele){
+        var position = {};
+//        console.log('===point===',point.pageX);
+//        console.log('===ele.offset().left===',ele.offset().left);
+        position.x=point.pageX-ele.offset().left; //获取当前鼠标相对ele的X坐标
+        position.y=point.pageY-ele.offset().top; //获取当前鼠标相对ele的Y坐标
+        position.x = position.x<0?0: position.x;
+        position.y = position.y<0?0: position.y;
+        return  position;
+    }
+    $(function(){
+        var position_start = {};
+        var position_end = {};
+        var originWH = {};
+
+        $('.s-bg-cutimg-ctrl-tl').mousedown(function(event){
+            var _this = this;
+            position_start= getPosition(event,$('#out'));
+            console.log('===position_start====',position_start);
+            $('.s-bg-cutimg-ctrl-tl').mousemove(function(event1 ){
+                var $select = $('.s-bg-cutimg-select');
+                var $boder = $('.s-bg-cutimg-select-border');
+                var $img = $('.s-bg-cutimg-show-img');
+                originWH.width =  $select.width();
+                originWH.height = $select.height();
+                position_end = getPosition(event1,$('#out'));
+                var result = dd(position_end,position_start,originWH);
+//                console.log('===position_end====',position_end);
+                $select.css({
+                    'left':position_end.x,
+                    'top':position_end.y,
+                    'width':result.width,
+                    'height':result.height
+                });
+                $boder.css({
+                    'width':result.width-2,
+                    'height':result.height-2
+                });
+                $img.css({
+                    'left':-(position_end.x),
+                    'top':-(position_end.y)
+                });
+            });
+
+        }).mouseup(function(event2){
+                    $('.s-bg-cutimg-ctrl-tl').unbind('mousemove');
+                    position_end = getPosition(event2,$('#out'));
+                    console.log('===position_end====',position_end);
+                });
+       $(document).click(function(){
+           $('.cutimg-ctrl-cell').unbind('mousemove');
+       });
+
+    });
+</script>
+</body>
+</html>
